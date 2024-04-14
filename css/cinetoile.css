@@ -1,0 +1,383 @@
+/**** Général ****/
+.container {
+	padding-top: 90px;
+	padding-bottom: 40px;
+}
+
+a:link,
+a:visited {
+	text-decoration: none;
+	color: black;
+}
+
+a:hover,
+a:visited:hover {
+	color: blue !important;
+}
+
+/**** Barre de navigation ****/
+.navbar-brand,
+.nav-link {
+	color: white !important;
+}
+
+#texteSeConnecter {
+	margin-right: 5px;
+}
+
+.ui-autocomplete { /* Recherche Autocompletion décalé un peu vers le bas */
+	z-index: 2000 !important;
+	position: fixed !important;
+}
+
+/**** Pages : rechercher et categories_recherche ****/
+.caseRecherche {
+	box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, 
+				rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, 
+				rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+}
+
+/**** Page : categories ****/
+#categories {
+	font-family: Dinot, sans-serif;
+	font-weight: bold;
+	font-size: 45px;
+}
+
+.boxCategories {
+	box-shadow: 0 8px 6px -6px black;
+	background-color: #2E4053;
+}
+
+.lienCategories {
+	color: white !important;
+}
+
+/**** Page : Films et individus ****/
+
+.champFilm,
+.champIndividu {
+	font-family: Dinot,sans-serif;
+	font-weight: bold;
+	font-size: 35px;
+}
+
+/**** Film - Rédiger critique ****/
+
+.responsive-textarea {
+	width: 50%;
+	resize: vertical;
+	height: auto;
+	box-sizing: border-box;
+}
+
+/**** Page : connexion et inscription ****/
+.body_formulaire {
+	background-image: url(../img/formulaire/central_cinema.jpg);
+	background-size: 100%;
+}
+
+#formulaire {
+	width: 90%;
+	max-width: 500px;
+	margin: 13vh auto;
+	padding: 10% 5%;
+	box-shadow: 10px 10px 2px 1px rgba(0, 0, 0, 0.2);
+	background-color: #292b2c;
+	color: white;
+}
+
+.alert-danger,
+.alert-success {
+	font-weight: bold;
+}
+
+/**** Affiches ****/
+#a_laffiche {
+	padding-top: 25px;
+}
+
+.affiche {
+    position: relative;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+  
+.overlay {
+    position: absolute;
+    bottom: 0;
+    background: #18181abb;
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    color: white;
+}
+
+.titreAffiche {
+    font-size: 17px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    line-height: 1.35em;
+    letter-spacing: 1px;
+}
+
+.soustitreAffiche {
+    font-size: 13px;
+    max-height: 0;
+    opacity: 0;
+}
+
+.affiche:hover .soustitreAffiche {
+    opacity: 1;
+    max-height: 100px;
+    margin-top: 5px;
+    transition: opacity 1s ease-out, max-height 0.9s ease-out;
+}
+
+.affiche:hover .titreAffiche {
+	color: orange !important;
+}
+
+.affiche:hover .overlay,
+.affiche:hover img {
+    transform: scale(0.99);
+}
+
+/***** Articles *****/
+.card {
+	height: 460px;
+	overflow: hidden; /* Pour cacher tout contenu dépassant la hauteur */
+	box-shadow:rgba(0, 0, 0, 0.5) 0px 3px 3px;
+}
+
+.date_article {
+	background-color: #393e46;
+	color: white; 
+	padding: 4px 8px; 
+	margin-bottom: 8px; 
+	font-size: 12px; 
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+/**** Owl Carousel ****/
+
+.owl-carousel {
+	max-width: 100%;
+	max-height: 600px;
+	margin: 0 auto;
+}
+
+.slide-content img {
+	position: relative;
+}
+
+.slide-content p {
+    padding: 10px;
+    z-index: 1;
+    position: absolute;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    bottom : 0;
+    color: white;
+    width: 100%;
+    background-color: rgba(0,0,0, 0.4);
+}
+
+.slide-content .carouselTitre {
+    color: whitesmoke;
+	font-family: 'Helvetica Neue',sans-serif;
+	font-size: 46px;
+	font-weight: 100;
+	letter-spacing: 1px;
+	text-shadow: black 0.1em 0.1em 0.2em;
+}
+
+.slide-content .legende {
+    color: white;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 20px;
+	font-weight: 300;
+	line-height: 32px;
+	text-shadow: black 0.1em 0.1em 0.2em;
+}
+
+.owl-nav button {
+    border: none;
+    outline: none;
+}
+
+.owl-prev, .owl-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #fff !important;
+    font-size: 65px !important;
+    font-weight: bolder !important;
+    background: none !important;
+}
+
+.owl-prev {
+    left: 1%;
+}
+
+.owl-next {
+    right: 1%;
+}
+
+/**** Articles ****/
+
+.dateArticle {
+	font-family: 'Georgia', serif;
+	font-style: italic;
+	font-size: 18px;
+	line-height: 22px;
+}
+
+.titreArticle {
+	font-family: 'Helvetica Neue', sans-serif;
+	font-size: 28px;
+	font-weight: 100;
+}
+
+/**** La note de l'utilisateur ****/
+
+#note_utilisateur {
+	position: relative;
+	top: -19px;
+	width: 20px;
+	display: inline-block;
+}
+
+/**** Responsive pour écrans différents ****/
+
+@media screen and (max-width: 992px){
+    .slide-content .carouselTitre {
+        font-size : 30px;
+    }
+
+    .slide-content .legende {
+        font-size : 20px;
+    }
+
+	.titreAffiche {
+		font-size: 15px !important;
+	}
+
+	.owl-carousel {
+		max-height: auto;
+	}
+
+	#a_laffiche {
+		padding-top: 5px;
+	}
+
+	#titreFilm,
+	#nomIndividu {
+		text-align: center;
+		padding-top: 10px;
+	}
+
+	#recommandation {
+		padding-top: 20px;
+	}
+}
+
+@media screen and (max-width: 767px){
+	.navbar form {
+		padding-top: 0px;
+	}
+
+	.navbar form button {
+		display: none;
+	}
+
+    #critique .card-img-right,
+	#critique .card-img-left {
+		display: none;
+    }
+
+    .slide-content .carouselTitre {
+        font-size : 15px;
+    }
+
+    .slide-content .legende {
+        font-size : 10px;
+    }
+
+	.boxCategories {
+		font-size: 10px;
+	}
+	
+	.champFilm, .champIndividu {
+		font-size: 30px;
+	}
+
+	.responsive-textarea {
+		width: 100%;
+	}
+
+	#texteSeConnecter {
+		margin-bottom: 5px;
+	}
+
+	#actu_secondaire {
+		display: none;
+	}
+
+	#note_utilisateur {
+		top: -13px;
+	}
+
+	.titreAffiche, .soustitreAffiche {
+		font-size: 10px !important;
+	}
+
+	.rate > label:before {
+		font-size: 1.2rem !important;
+	}
+}
+
+/**** Les étoiles cliquables (notes) ****/
+
+/* Ratings widget */
+.rate {
+    display: inline-block;
+    border: 0;
+}
+/* Hide radio */
+.rate > input {
+    display: none;
+}
+/* Order correctly by floating highest to the right */
+.rate > label {
+    float: right;
+}
+/* The star of the show */
+.rate > label:before {
+    display: inline-block;
+	font-size: 1.7rem;
+    padding: .3rem .2rem;
+    margin: 0;
+    cursor: pointer;
+    font-family: FontAwesome;
+    content: "\f005 "; /* full star */
+}
+
+/* Half star trick */
+.rate .half:before {
+    content: "\f089 "; /* half star no outline */
+    position: absolute;
+    padding-right: 0;
+}
+/* Click + hover color */
+input:checked ~ label, /* color current and previous stars on checked */
+label:hover, label:hover ~ label { color: gold;  } /* color previous stars on hover */
+
+/* Hover highlights */
+input:checked + label:hover, input:checked ~ label:hover, /* highlight current and previous stars */
+input:checked ~ label:hover ~ label, /* highlight previous selected stars for new rating */
+label:hover ~ input:checked ~ label /* highlight previous selected stars */ { color: gold;  }
+
+/**** Les étoiles affichables (notes) ****/
