@@ -8,8 +8,12 @@ require $racine . '/CineToile/util/page_interdite_si_non_connecte.php';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
-	<head><?php require $racine . '/CineToile/base/head.php'; ?></head>
-	<body><?php require $racine . '/CineToile/base/barremenu.php'; ?>
+	<head>
+		<?php require $racine . '/CineToile/base/head.php'; ?>
+	</head>
+	<body>
+		<?php require $racine . '/CineToile/base/barremenu.php'; ?>
+
 		<div class="container text-center" style="min-height:100vh;">
 			<b>Souhaitez-vous réellement vous désinscrire du site ?</b>
 			<div class="row pt-4">
@@ -21,6 +25,7 @@ require $racine . '/CineToile/util/page_interdite_si_non_connecte.php';
 				</div>
 			</div>
 		</div>
+
 		<?php require $racine . '/CineToile/base/footer.php'; ?>
 	</body>
 </html>

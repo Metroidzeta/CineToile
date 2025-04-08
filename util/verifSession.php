@@ -1,11 +1,10 @@
-<?php // v1.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend) et Roger Huang (frontend/design)
-// v3.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend)
+<?php
+/**
+ * Utilitaire : Vérification de la connexion d'une session
+ * Version : v3.0
+ * Auteur : Alain Barbier alias "Metroidzeta" (backend/frontend), Roger Huang (frontend/design)
+ */
 
 session_start();
-$connecte = false;
-
-if(isset($_SESSION['pseudo']) && !empty($_SESSION['pseudo'])
-	AND isset($_SESSION['EMAIL']) && !empty($_SESSION['EMAIL'])) {
-	$connecte = true;
-}
+$connecte = isset($_SESSION['pseudo'], $_SESSION['EMAIL']) && !empty($_SESSION['pseudo']) && !empty($_SESSION['EMAIL']);
 ?>

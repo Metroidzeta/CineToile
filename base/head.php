@@ -1,7 +1,12 @@
-<?php // v1.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend) et Roger Huang (frontend/design)
-// v3.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend) ?>
-
-		<meta charset="utf-8"/>
+<?php
+/**
+ * Page : Le head de la page html
+ * Version : v3.0
+ * Auteur : Alain Barbier alias "Metroidzeta" (backend/frontend), Roger Huang (frontend/design)
+ */
+ ?>
+ 
+		<meta charset="UTF-8" />
 
 		<title>Ciné-Toile</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>

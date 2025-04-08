@@ -11,8 +11,19 @@ if(isset($_GET['rechercher']) && !empty($_GET['rechercher']) && !ctype_space($_G
 	$recherche = str_replace(' ','',$recherche); // supprimer les espaces
 	$recherche_sql = "%{$recherche}%";
 
-	$films = executeReqFetchAllArgs($dbh,'SELECT TITRE FROM films WHERE UPPER(REPLACE(TITRE," ","")) LIKE ?',[$recherche_sql]);
-	$individus = executeReqFetchAllArgs($dbh,'SELECT NOM FROM individus WHERE UPPER(REPLACE(NOM," ","")) LIKE ?',[$recherche_sql]);
+	$films = executeReqFetchAllArgs(
+		$dbh,
+		'SELECT TITRE FROM films
+		WHERE UPPER(REPLACE(TITRE," ","")) LIKE ?',
+		[$recherche_sql]
+	);
+
+	$individus = executeReqFetchAllArgs(
+		$dbh,
+		'SELECT NOM FROM individus
+		WHERE UPPER(REPLACE(NOM," ","")) LIKE ?',
+		[$recherche_sql]
+	);
 
 	$resultat = [];
 	foreach($films as $film) {

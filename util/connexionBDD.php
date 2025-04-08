@@ -1,25 +1,25 @@
 <?php // v1.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend) et Roger Huang (frontend/design)
 // v3.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend)
 
-$nom_BDD = "cinema";
+$db_name = "cinema";
 $identifiant = "root";
-$mdp = "";
+$password = "";
 
 try {
-	$dbh = new PDO('mysql:host=localhost;dbname='. $nom_BDD .';charset=utf8',$identifiant,$mdp);
+	$dbh = new PDO('mysql:host=localhost;dbname='. $db_name .';charset=utf8', $identifiant, $password);
 } catch (Exception $e) {
 	die('Erreur de connexion BDD : ' . $e->getMessage());
 }
 
 //$dbh->query("SET NAMES UTF8");
 
-function executeReqArgs($db,$req,$args) {
+function executeReqArgs($db ,$req, $args) {
 	$requete = $db->prepare($req);
 	$requete->execute($args);
 	$requete->closeCursor();
 }
 
-function executeReqFetch($db,$req) {
+function executeReqFetch($db, $req) {
 	$requete = $db->prepare($req);
 	$requete->execute();
 	$data = $requete->fetch();
@@ -27,7 +27,7 @@ function executeReqFetch($db,$req) {
 	return $data;
 }
 
-function executeReqFetchArgs($db,$req,$args) {
+function executeReqFetchArgs($db, $req, $args) {
 	$requete = $db->prepare($req);
 	$requete->execute($args);
 	$data = $requete->fetch();
@@ -35,7 +35,7 @@ function executeReqFetchArgs($db,$req,$args) {
 	return $data;
 }
 
-function executeReqFetchAll($db,$req) {
+function executeReqFetchAll($db, $req) {
 	$requete = $db->prepare($req);
 	$requete->execute();
 	$data = $requete->fetchAll();
@@ -43,7 +43,7 @@ function executeReqFetchAll($db,$req) {
 	return $data;
 }
 
-function executeReqFetchAllArgs($db,$req,$args) {
+function executeReqFetchAllArgs($db, $req, $args) {
 	$requete = $db->prepare($req);
 	$requete->execute($args);
 	$data = $requete->fetchAll();
@@ -51,10 +51,10 @@ function executeReqFetchAllArgs($db,$req,$args) {
 	return $data;
 }
 
-function executeReqFetchAllArgsLimitOffset($db,$req,$args) {
+function executeReqFetchAllArgsLimitOffset($db, $req, $args) {
 	$requete = $db->prepare($req);
 	foreach($args as $key => $value) {
-		$requete->bindValue($key,$value,PDO::PARAM_INT);
+		$requete->bindValue($key, $value, PDO::PARAM_INT);
 	}
 	$requete->execute();
 	$data = $requete->fetchAll();
@@ -62,15 +62,15 @@ function executeReqFetchAllArgsLimitOffset($db,$req,$args) {
 	return $data;
 }
 
-function executeReqFetchAllArgsLimitOffsetFirstSTR($db,$req,$args) {
+function executeReqFetchAllArgsLimitOffsetFirstSTR($db, $req, $args) {
 	$requete = $db->prepare($req);
 	$premier = true;
 	foreach($args as $key => $value) {
 		if($premier) { 
-			$requete->bindValue($key,$value,PDO::PARAM_STR);
+			$requete->bindValue($key, $value, PDO::PARAM_STR);
 			$premier = false;
 		} else {
-			$requete->bindValue($key,$value,PDO::PARAM_INT);
+			$requete->bindValue($key, $value, PDO::PARAM_INT);
 		}
 	}
 	$requete->execute();

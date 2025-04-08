@@ -1,5 +1,9 @@
-<?php // v1.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend) et Roger Huang (frontend/design)
-// v3.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend)
+<?php
+/**
+ * Page : Affichage de la page connexion (/connexion)
+ * Version : v3.0
+ * Auteur : Alain Barbier alias "Metroidzeta" (backend/frontend), Roger Huang (frontend/design)
+ */
 
 $racine = $_SERVER['DOCUMENT_ROOT'];
 
@@ -9,11 +13,16 @@ require $racine . '/CineToile/util/connexionBDD.php';
 
 $msgErr = '';
 
-if(isset($_POST['connexion']) && !empty($_POST['connexion'])) { // On récupére les informations du formulaire de connexion
+if(isset($_POST['connexion']) && !empty($_POST['connexion'])) {
 	$email = htmlspecialchars(trim($_POST['email'])); // On récupére l'email
 	$mdp = htmlspecialchars(trim($_POST['mdp'])); // On récupére le mot de passe
 
-	$utilisateur = executeReqFetchArgs($dbh,'SELECT * FROM utilisateurs WHERE EMAIL = ?',[$email]); // On vérifie si cet email existe bien et on récupére les informations de l'utilisateur
+	$utilisateur = executeReqFetchArgs( // On récupére les informations de l'utilisateur
+		$dbh,
+		'SELECT * FROM utilisateurs
+		WHERE EMAIL = ?',
+		[$email]
+	);
 
 	if(!$utilisateur) { // Si l'utilisateur n'existe pas (cet email n'existe pas)
 		$msgErr .= "- Cet email n'existe pas<br />";
@@ -29,14 +38,18 @@ if(isset($_POST['connexion']) && !empty($_POST['connexion'])) { // On récupére
 ?>
 <!DOCTYPE html>
 <html lang="fr">
-	<head><?php require $racine . '/CineToile/base/head.php'; ?></head>
-	<body class="body_formulaire"><?php require $racine . '/CineToile/base/barremenu.php'; ?>
+	<head>
+		<?php require $racine . '/CineToile/base/head.php'; ?>
+	</head>
+	<body class="body_formulaire">
+		<?php require $racine . '/CineToile/base/barremenu.php'; ?>
+
 		<div class="container">
 			<div id="formulaire" class="text-center">
 				<h2>Connexion</h2>
 				<form action="connexion" method="POST">
 					<div class="mb-3">
-						<input type="email" name="email" class="form-control" placeholder="Email" value="<?php if(!empty($msgErr)) { echo $email; } ?>" required="required" autocomplete="off"/>
+						<input type="email" name="email" class="form-control" placeholder="Email" value="<?= !empty($msgErr) ? $email : '' ?>" required="required" autocomplete="off"/>
 					</div>
 					<div class="mb-3">
 						<input type="password" name="mdp" class="form-control" placeholder="Mot de passe" required="required" autocomplete="off"/>
@@ -46,9 +59,9 @@ if(isset($_POST['connexion']) && !empty($_POST['connexion'])) { // On récupére
 					</div>
 				</form>
 				<p>Pas encore inscris ? <a class="text-danger" href="inscription">Incrivez-vous!</a></p>
-				<?php if(!empty($msgErr)) { ?>
+				<?php if(!empty($msgErr)): ?>
 					<div class="alert alert-danger"><?= $msgErr ?></div>
-				<?php } ?>
+				<?php endif; ?>
 			</div>
 		</div>
     </body>

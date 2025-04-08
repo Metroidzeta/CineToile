@@ -1,5 +1,10 @@
-<?php // v1.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend) et Roger Huang (frontend/design)
-// v3.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend) ?>
+<?php
+/**
+ * Page : Le footer de la page html
+ * Version : v3.0
+ * Auteur : Alain Barbier alias "Metroidzeta" (backend/frontend), Roger Huang (frontend/design)
+ */ 
+ ?>
 
 		<footer class="bg-dark text-center text-white">
 			<div class="pb-1 pt-3">
