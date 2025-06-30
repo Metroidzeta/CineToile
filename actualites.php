@@ -15,25 +15,22 @@ define('NB_ARTICLES_PAR_PAGE', 8); // Nombre d'articles par page (par défaut : 
 $valid = false;
 
 if (!isset($_GET['page']) || ctype_digit($_GET['page'])) {
-	$numPage = isset($_GET['page']) ? (int) $_GET['page'] : 1; // On récupère le numéro de la page (1 par défaut)
-
-	$nbArticles = executeReqFetch( // Nombre d'articles existants dans la BDD
-		$dbh,
-		'SELECT COUNT(*) AS nb_articles
-		FROM articles')['nb_articles'];
-
-	$nbPages = (int) ceil($nbArticles / NB_ARTICLES_PAR_PAGE); // Arrondi au nombre supérieur
+	$numPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+	$nbArticles = (int) executeReqFetchColumn($dbh, // Nombre d'articles existants
+		'SELECT COUNT(*) FROM articles'
+	);
+	$nbPages = (int) ceil($nbArticles / NB_ARTICLES_PAR_PAGE); // Arrondie à l'entier supérieur
 
 	if ($numPage > 0 && $numPage <= $nbPages) {
 		$offset = ($numPage - 1) * NB_ARTICLES_PAR_PAGE;
-
-		$articles = executeReqFetchAllArgsLimitOffset( // On récupère les articles correspondant à cette page
-			$dbh,
+		$articles = executeReqFetchAllArgsLimitOffset($dbh, // On récupère les articles correspondant à cette page (ordre descendant)
 			'SELECT * FROM articles
 			ORDER BY DATE_ARTICLE DESC LIMIT :limit OFFSET :offset',
-			[':limit' => NB_ARTICLES_PAR_PAGE,':offset' => $offset]
+			[
+				':limit' => NB_ARTICLES_PAR_PAGE,
+				':offset' => $offset
+			]
 		);
-
 		$startPage = max($numPage - 2, 1);
 		$endPage = min($numPage + 2, $nbPages);
 		$valid = true;
@@ -57,11 +54,11 @@ if (!isset($_GET['page']) || ctype_digit($_GET['page'])) {
 							<div class="col-12 col-md-6 col-lg-3">
 								<a href="article?id=<?= (int) $article['id_article'] ?>">
 									<div class="card w-300 h-200 mt-3">
-										<img class="card-img-top" src="img/actualites/<?= basename(rawurldecode($article['IMAGE_ARTICLE'])) ?>" alt="image article <?= htmlspecialchars($article['TITRE']) ?>"/>
+										<img class="card-img-top" loading="lazy" src="/CineToile/img/actualites/<?= basename(rawurldecode($article['IMAGE_ARTICLE'])) ?>" alt="image article <?= htmlspecialchars($article['TITRE']) ?>"/>
 										<div class="card-body">
-											<h5 class="card-title"><?= $article['TITRE'] ?></h5>
+											<h5 class="card-title"><?= htmlspecialchars($article['TITRE']) ?></h5>
 											<p class="card-text"><?= nl2br(htmlspecialchars($article['RESUME'])) ?></p>
-											<span class="date_article"><?= obtenirDate($article['DATE_ARTICLE']) ?></span>
+											<span class="date_article"><?= extraireDate($article['DATE_ARTICLE']) ?></span>
 										</div>
 									</div>
 								</a>
@@ -79,10 +76,14 @@ if (!isset($_GET['page']) || ctype_digit($_GET['page'])) {
 							<?php endif; ?>
 
 							<?php for ($i = $startPage; $i <= $endPage; $i++): ?>
-								<a href="actualites?page=<?= $i ?>" <?= $i === $numPage ? 'class="text-warning fw-bold"' : '' ?>> <?= $i ?></a>
+								<?php if ($i === $numPage): ?>
+									<span class="text-warning fw-bold"><?= $i ?></span>
+								<?php else: ?>
+									<a href="actualites?page=<?= $i ?>"><?= $i ?></a>
+								<?php endif; ?>
 							<?php endfor; ?>
 
-							<?php if ($endPage !== $nbPages): ?>
+							<?php if ($endPage < $nbPages): ?>
 								... <a href="actualites?page=<?= $nbPages ?>">dernier »</a>
 							<?php endif; ?>
 						</div>

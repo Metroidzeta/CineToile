@@ -12,8 +12,8 @@ $(document).ready(function() {
 	});
 
 	$('.owl-next, .owl-prev').on('click',function() {
-		if(arrete == false) {
-			setTimeout(function(){ //setTimeout de 200 ms pour éviter le bug du click de la flèche précédente dès le début.
+		if(!arrete) {
+			setTimeout(function() { //setTimeout de 200 ms pour éviter le bug du click de la flèche précédente dès le début.
 				$('.owl-carousel').data('owl.carousel').options.autoplay = false;
 				$('.owl-carousel').trigger('refresh.owl.carousel');
 			}, 200);
@@ -22,7 +22,7 @@ $(document).ready(function() {
 	});
 
 	$("#autocomplete").autocomplete({
-		source: function(request,response){
+		source: function(request,response) {
 			$.ajax({
 				url: '/CineToile/util/autocompletion',
 				type: 'GET',

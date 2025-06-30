@@ -1,7 +1,7 @@
 <?php // v1.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend) et Roger Huang (frontend/design)
 // v3.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend)
 
-function obtenirMetiers($metiers, $genre) {
+function extraireMetiers($metiers, $genre) {
 	if(empty($metiers)) { return ''; }
 
 	$metiersToString = [
@@ -9,7 +9,7 @@ function obtenirMetiers($metiers, $genre) {
 		'A' => ($genre === 'F') ? 'Actrice ' : 'Acteur '
 	];
 
-	$resultat = strtr($metiers,$metiersToString);
+	$resultat = strtr($metiers, $metiersToString);
 
     return rtrim($resultat); // supprime l'espace en fin de chaine
 }

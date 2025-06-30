@@ -1,13 +1,27 @@
-<?php // v1.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend) et Roger Huang (frontend/design)
-// v3.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend)
+<?php
+/**
+ * Utilitaire : Extraire une date de la BDD (fonction extraireDate)
+ * Version : v3.0
+ * Auteur : Alain Barbier alias "Metroidzeta" (backend/frontend), Roger Huang (frontend/design)
+ */
 
-function obtenirDate($valeur) {
-	if(empty($valeur)) { return ''; }
+function extraireDate(string $valeur): string {
+	if (empty($valeur)) { return ''; }
 
-	// Le tableau des mois pour transformer le mois d'une date provenant de la BDD sous forme de texte en français
-	$tab_mois_fr = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+	$mois_fr = [ 1 => // On commence à l'index 1
+		'janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'
+	];
 
-	[$annee, $mois, $jour] = explode('-',$valeur);
-	return (int) $jour . ' ' . $tab_mois_fr[(int) $mois - 1] . ' ' . $annee;
+	// Vérifie que le format est bien correct
+	if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $valeur)) { return ''; }
+
+	[$annee, $mois, $jour] = explode('-', $valeur);
+
+	$mois = (int) $mois;
+	$jour = (int) $jour;
+
+	if ($mois < 1 || $mois > 12) { return ''; }
+
+	return "{$jour} {$mois_fr[$mois]} {$annee}";
 }
 ?>

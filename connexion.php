@@ -13,24 +13,23 @@ require $racine . '/CineToile/util/connexionBDD.php';
 
 $msgErr = '';
 
-if(isset($_POST['connexion']) && !empty($_POST['connexion'])) {
+if (isset($_POST['connexion']) && !empty($_POST['connexion'])) {
 	$email = htmlspecialchars(trim($_POST['email'])); // On récupére l'email
-	$mdp = htmlspecialchars(trim($_POST['mdp'])); // On récupére le mot de passe
+	$password = htmlspecialchars(trim($_POST['password'])); // On récupére le mot de passe
 
-	$utilisateur = executeReqFetchArgs( // On récupére les informations de l'utilisateur
-		$dbh,
-		'SELECT * FROM utilisateurs
-		WHERE EMAIL = ?',
-		[$email]
+	$user = executeReqFetchArgs($dbh, // On récupére les informations de l'utilisateur
+		'SELECT *
+		FROM utilisateurs
+		WHERE EMAIL = ?',[$email]
 	);
 
-	if(!$utilisateur) { // Si l'utilisateur n'existe pas (cet email n'existe pas)
+	if (!$user) { // Si l'utilisateur n'existe pas (cet email n'existe pas)
 		$msgErr .= "- Cet email n'existe pas<br />";
-	} else if(!password_verify($mdp,$utilisateur['MOTDEPASSE'])) { // Si mdp incorrect
+	} else if (!password_verify($password, $user['MOTDEPASSE'])) { // Si mdp incorrect
 		$msgErr .= '- Le mot passe est incorrect<br />';
 	} else { // Correct
-		$_SESSION['pseudo'] = $utilisateur['pseudo'];
-		$_SESSION['EMAIL'] = $utilisateur['EMAIL'];
+		$_SESSION['pseudo'] = $user['pseudo'];
+		$_SESSION['EMAIL'] = $user['EMAIL'];
 		header('Location:/CineToile/profil');
 		die();
 	}
@@ -47,12 +46,12 @@ if(isset($_POST['connexion']) && !empty($_POST['connexion'])) {
 		<div class="container">
 			<div id="formulaire" class="text-center">
 				<h2>Connexion</h2>
-				<form action="connexion" method="POST">
+				<form action="connexion" method="POST" autocomplete="off">
 					<div class="mb-3">
-						<input type="email" name="email" class="form-control" placeholder="Email" value="<?= !empty($msgErr) ? $email : '' ?>" required="required" autocomplete="off"/>
+						<input type="email" name="email" class="form-control" placeholder="Email" value="<?= !empty($msgErr) ? $email : '' ?>" required/>
 					</div>
 					<div class="mb-3">
-						<input type="password" name="mdp" class="form-control" placeholder="Mot de passe" required="required" autocomplete="off"/>
+						<input type="password" name="password" class="form-control" placeholder="Mot de passe" required/>
 					</div>
 					<div class="mb-3">
 						<input type="submit" name="connexion" class="btn btn-danger" value="Se connecter"/>

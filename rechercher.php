@@ -8,48 +8,70 @@ require $racine . '/CineToile/util/connexionBDD.php';
 require $racine . '/CineToile/util/afficher_realisateurs_avec_phrase.php';
 require $racine . '/CineToile/util/extraire_metiers.php';
 
-define('NB_RESULTATS_PAR_PAGE',8); // Le nombre de résultats par page, par défaut : 8
+define('NB_RESULTATS_PAR_PAGE', 8); // Le nombre de résultats par page, par défaut : 8
 $nb_films_trouves = $nb_individus_trouves = 0;
 $valid = false;
 
-if(isset($_GET['q']) && !empty($_GET['q']) && !ctype_space($_GET['q'])) {
+if (isset($_GET['q']) && !empty($_GET['q']) && !ctype_space($_GET['q'])) {
 	$recherche = htmlspecialchars($_GET['q']);
 	$recherche_save = $recherche;
 	$recherche = mb_strtoupper($recherche); // mettre en majuscules
-	$recherche = str_replace(' ','',$recherche); // supprimer les espaces
-	if(!empty($recherche)) {
-		if((isset($_GET['page']) && ctype_digit($_GET['page'])) || !isset($_GET['page'])) {
+	$recherche = str_replace(' ', '', $recherche); // supprimer les espaces
+	if (!empty($recherche)) {
+		if (!isset($_GET['page']) || ctype_digit($_GET['page'])) {
 			$recherche_sql = "%{$recherche}%";
 			$numPage = isset($_GET['page']) ? (int) $_GET['page'] : 1; // On récupére le numéro de la page
 
-			$nbFilms_trouves = executeReqFetchArgs($dbh,'SELECT COUNT(*) AS nb_films FROM films WHERE UPPER(REPLACE(TITRE," ","")) LIKE ?',[$recherche_sql])['nb_films'];
-			$nbIndividus_trouves = executeReqFetchArgs($dbh,'SELECT COUNT(*) AS nb_individus FROM individus WHERE UPPER(REPLACE(NOM," ","")) LIKE ?',[$recherche_sql])['nb_individus'];
-			$nbPages = ceil(($nbFilms_trouves + $nbIndividus_trouves) / NB_RESULTATS_PAR_PAGE); // Arrondi au nombre supérieur
+			$nbFilms_trouves = (int) executeReqFetchArgs($dbh,
+				'SELECT COUNT(*) AS nb_films FROM films
+				WHERE UPPER(REPLACE(TITRE," ","")) LIKE ?',[$recherche_sql])['nb_films'];
 
-			if($nbFilms_trouves == 0 && $nbIndividus_trouves == 0 && $numPage == 1) {
-				$debut = $fin = $nbPages = 1;
+			$nbIndividus_trouves = (int) executeReqFetchArgs($dbh,
+				'SELECT COUNT(*) AS nb_individus FROM individus
+				WHERE UPPER(REPLACE(NOM," ","")) LIKE ?',[$recherche_sql])['nb_individus'];
+
+			$nbResultats = $nbFilms_trouves + $nbIndividus_trouves;
+			$nbPages = (int) ceil($nbResultats / NB_RESULTATS_PAR_PAGE); // Arrondie à l'entier supérieur
+
+			if ($nbFilms_trouves === 0 && $nbIndividus_trouves === 0 && $numPage === 1) {
+				$startPage = $endPage = $nbPages = 1;
 				$nbFilms_cette_page = $nbIndividus_cette_page = 0;
 				$valid = true;
-			} else if($numPage > 0 && $numPage <= $nbPages) {
+			} else if ($numPage > 0 && $numPage <= $nbPages) {
 				$offset_films = ($numPage - 1) * NB_RESULTATS_PAR_PAGE;
-				$films = executeReqFetchAllArgsLimitOffsetFirstSTR($dbh,'SELECT id_film, TITRE, AFFICHE FROM films WHERE UPPER(REPLACE(TITRE," ","")) LIKE :recherche LIMIT :limit OFFSET :offset',[':recherche' => $recherche_sql,':limit' => NB_RESULTATS_PAR_PAGE,':offset' => $offset_films]);
+				$films = executeReqFetchAllArgsLimitOffsetFirstSTR($dbh,
+					'SELECT id_film, TITRE, AFFICHE FROM films 
+					WHERE UPPER(REPLACE(TITRE," ","")) LIKE :recherche LIMIT :limit OFFSET :offset',
+					[
+						':recherche' => $recherche_sql,
+						':limit' => NB_RESULTATS_PAR_PAGE,
+						':offset' => $offset_films
+					]
+				);
 				$nbFilms_cette_page = count($films);
+				$nbIndividus_cette_page = 0;
 
-				if($nbFilms_cette_page < NB_RESULTATS_PAR_PAGE) {
-					$nbPages_ayant_films = ceil($nbFilms_trouves / NB_RESULTATS_PAR_PAGE); // Arrondi au nombre supérieur
-					$offset_individus = $numPage - $nbPages_ayant_films == 0 ? 0 : ($numPage - $nbPages_ayant_films) * NB_RESULTATS_PAR_PAGE - ($nbFilms_trouves % NB_RESULTATS_PAR_PAGE);
-					if($numPage - $nbPages_ayant_films > 0 && $nbFilms_trouves % NB_RESULTATS_PAR_PAGE == 0) {
+				if ($nbFilms_cette_page < NB_RESULTATS_PAR_PAGE) {
+					$nbPages_ayant_films = (int) ceil($nbFilms_trouves / NB_RESULTATS_PAR_PAGE); // Arrondie à l'entier supérieur
+					$offset_individus = ($numPage - $nbPages_ayant_films == 0) ? 0 : (($numPage - $nbPages_ayant_films) * NB_RESULTATS_PAR_PAGE - ($nbFilms_trouves % NB_RESULTATS_PAR_PAGE));
+					if ($numPage - $nbPages_ayant_films > 0 && $nbFilms_trouves % NB_RESULTATS_PAR_PAGE == 0) {
 						$offset_individus = ($numPage - 1 - $nbPages_ayant_films) * NB_RESULTATS_PAR_PAGE;
 					}
 					$limit_individus = NB_RESULTATS_PAR_PAGE - $nbFilms_cette_page;
-					$individus = executeReqFetchAllArgsLimitOffsetFirstSTR($dbh,'SELECT id_individu, NOM, METIERS, GENRE, PHOTO FROM individus WHERE UPPER(REPLACE(NOM," ","")) LIKE :recherche LIMIT :limit OFFSET :offset',[':recherche' => $recherche_sql,':limit' => $limit_individus,':offset' => $offset_individus]);
+					$individus = executeReqFetchAllArgsLimitOffsetFirstSTR($dbh,
+						'SELECT id_individu, NOM, METIERS, GENRE, PHOTO FROM individus
+						WHERE UPPER(REPLACE(NOM," ","")) LIKE :recherche LIMIT :limit OFFSET :offset',
+						[
+							':recherche' => $recherche_sql,
+							':limit' => $limit_individus,
+							':offset' => $offset_individus
+						]
+					);
 					$nbIndividus_cette_page = count($individus);
-				} else {
-					$nbIndividus_cette_page = 0;
 				}
 
-				$debut = max($numPage - 2,1);
-				$fin = min($numPage + 2,$nbPages);
+				$startPage = max($numPage - 2, 1);
+				$endPage = min($numPage + 2, $nbPages);
 				$valid = true;
 			}
 		}
@@ -58,30 +80,37 @@ if(isset($_GET['q']) && !empty($_GET['q']) && !ctype_space($_GET['q'])) {
 ?>
 <!DOCTYPE html>
 <html lang="fr">
-	<head><?php require $racine . '/CineToile/base/head.php'; ?></head>
-	<body class="bg-dark"><?php require $racine . '/CineToile/base/barremenu.php'; ?>
+	<head>
+		<?php require $racine . '/CineToile/base/head.php'; ?>
+	</head>
+	<body class="bg-dark">
+		<?php require $racine . '/CineToile/base/barremenu.php'; ?>
+
 		<div class="container bg-white" style="min-height: 100vh;">
-			<?php if(!empty($recherche)) {
-				if($valid) {
-					if($nbFilms_cette_page + $nbIndividus_cette_page > 0) {
-						if($nbFilms_cette_page > 0) { ?>
+			<?php if (!empty($recherche)):
+				if ($valid):
+					if ($nbFilms_cette_page + $nbIndividus_cette_page > 0):
+						if ($nbFilms_cette_page > 0): ?>
 							<div class="text-center">
-								<b>FILMS :</b> (<?php echo $nbFilms_trouves . ' résultat'; if($nbFilms_trouves > 1) { echo 's'; } echo ' trouvé'; if($nbFilms_trouves > 1) { echo 's'; } ?>)
+								<b>FILMS :</b> (<?= $nbFilms_trouves ?> résultat<?= ($nbFilms_trouves > 1) ? 's' : '' ?> trouvé<?= ($nbFilms_trouves > 1) ? 's' : '' ?>)
 							</div>
-							<?php foreach($films as $film) {
-								// On récupére le nom du (ou des) réalisateur(s) associé(s) à ce film
-								$realisateurs = executeReqFetchAllArgs($dbh,'SELECT NOM FROM individus INNER JOIN films_individus ON individus.id_individu = films_individus.id_individu WHERE id_film = ? AND role = "R"',[$film['id_film']]); ?>
+							<?php foreach ($films as $film): ?>
+								<?php $realisateurs = executeReqFetchAllArgs($dbh, // On récupére le nom du (ou des) réalisateur(s) associé(s) à ce film
+									'SELECT i.NOM FROM individus i
+									INNER JOIN films_individus fi ON i.id_individu = fi.id_individu
+									WHERE fi.id_film = ? AND fi.role = "R"',[$film['id_film']]
+								); ?>
 								<div class="row pt-4">
 									<div class="caseRecherche col-10 offset-1 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
 										<div class="row">
 											<div class="col-6 px-0">
-												<a href="film?id=<?= $film['id_film'] ?>">
+												<a href="film?id=<?= (int) $film['id_film'] ?>">
 													<img class="img-fluid" src="img/affiches/<?= $film['AFFICHE'] ?>" alt="affiche <?= $film['TITRE'] ?>"/>
 												</a>
 											</div>
 											<div class="col-6 mt-auto mb-auto">
 												<div class="text-uppercase">
-													<a href="film?id=<?= $film['id_film'] ?>"><?= $film['TITRE'] ?></a>
+													<a href="film?id=<?= (int) $film['id_film'] ?>"><?= $film['TITRE'] ?></a>
 												</div>
 												<small class="text-muted"><i>
 													<?php realisateurs_avec_phrase($realisateurs); ?>
@@ -90,47 +119,61 @@ if(isset($_GET['q']) && !empty($_GET['q']) && !ctype_space($_GET['q'])) {
 										</div>
 									</div>
 								</div>
-							<?php }
-						}
+							<?php endforeach; ?>
+						<?php endif; ?>
 
-						if($nbIndividus_cette_page > 0) { ?>
-							<div class="<?php if($nbFilms_cette_page > 0) { echo 'pt-4'; } ?> text-center">
-								<b>INDIVIDUS :</b> (<?php echo $nbIndividus_trouves . ' résultat'; if($nbIndividus_trouves > 1) { echo 's'; } echo ' trouvé'; if($nbIndividus_trouves > 1) { echo 's'; } ?>)
+						<?php if ($nbIndividus_cette_page > 0): ?>
+							<div class="<?= ($nbFilms_cette_page > 0) ? 'pt-4' : '' ?> text-center">
+								<b>INDIVIDUS :</b> (<?= $nbIndividus_trouves ?> résultat<?= ($nbIndividus_trouves > 1) ? 's' : '' ?> trouvé<?= ($nbIndividus_trouves > 1) ? 's' : '' ?>)
 							</div>
-							<?php foreach($individus as $individu) {
-								$metiers = obtenirMetiers($individu['METIERS'],$individu['GENRE']); ?>
+
+							<?php foreach ($individus as $individu):
+								$metiers = extraireMetiers($individu['METIERS'], $individu['GENRE']); ?>
 								<div class="row pt-4">
 									<div class="caseRecherche col-10 offset-1 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
 										<div class="row">
 											<div class="col-6 px-0">
-												<a href="individu?id=<?= $individu['id_individu'] ?>">
+												<a href="individu?id=<?= (int) $individu['id_individu'] ?>">
 													<img class="img-fluid" src="img/individus/<?= $individu['PHOTO'] ?>" alt="photo <?= $individu['NOM'] ?>"/>
 												</a>
 											</div>
 											<div class="col-6 mt-auto mb-auto">
 												<div>
-													<a href="individu?id=<?= $individu['id_individu'] ?>"><?= $individu['NOM'] ?></a>
+													<a href="individu?id=<?= (int) $individu['id_individu'] ?>"><?= $individu['NOM'] ?></a>
 												</div>
-												<small class="text-muted"><i><?php if(!empty($metiers)) { echo $metiers; } ?></i></small>
+												<small class="text-muted"><i>
+													<?= !empty($metiers) ? $metiers : '' ?>
+												</i></small>
 											</div>
 										</div>
 									</div>
 								</div>
-							<?php }
-						} ?>
+							<?php endforeach; ?>
+						<?php endif; ?>
+
 						<div class="row pt-3">
 							<div class="col-md-3 offset-md-3 col-3 offset-1">
 								<a href="home">« Retour</a>
 							</div>
 							<div class="col-md-3 offset-md-2 col-3 offset-4">
-								<?php if($debut != 1) { ?><a href="rechercher?q=<?= $recherche_save ?>&page=1">« premier </a> ...<?php }
-								for($i = $debut; $i <= $fin; $i++) { ?>
-									<a href="rechercher?q=<?= $recherche_save ?>&page=<?= $i ?>" <?php if($i == $numPage) { echo 'class="text-warning fw-bold"'; } ?>> <?= $i ?></a>
-								<?php }
-								if($fin != $nbPages) { ?> ... <a href="rechercher?q=<?= $recherche_save ?>&page=<?= $nbPages ?>"> dernier »</a><?php } ?>
+								<?php if ($startPage != 1): ?>
+									<a href="rechercher?q=<?= $recherche_save ?>">« premier</a> ...
+								<?php endif; ?>
+
+								<?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+									<?php if ($i === $numPage): ?>
+										<span class="text-warning fw-bold"><?= $i ?></span>
+									<?php else: ?>
+										<a href="rechercher?q=<?= $recherche_save ?>&page=<?= $i ?>"> <?= $i ?></a>
+									<?php endif; ?>
+								<?php endfor; ?>
+
+								<?php if ($endPage < $nbPages): ?>
+									... <a href="rechercher?q=<?= $recherche_save ?>&page=<?= $nbPages ?>">dernier »</a>
+								<?php endif; ?>
 							</div>
 						</div>
-					<?php } else { ?>
+					<?php else: ?>
 						<div class="row">
 							<div class="col-12 text-center">Aucun résultat trouvé</div> 
 						</div>
@@ -139,13 +182,13 @@ if(isset($_GET['q']) && !empty($_GET['q']) && !ctype_space($_GET['q'])) {
 								<a href="home">« Retour</a>
 							</div>
 						</div>
-					<?php }
-				} else { ?>
+					<?php endif; ?>
+				<?php else: ?>
 					<h2 class="text-center">Erreur : Mauvais numéro de page ou page inexistante</h2>
-				<?php }
-			} else { ?>
+				<?php endif; ?>
+			<?php else: ?>
 				<h2 class="text-center">Erreur : La recherche est vide</h2>
-			<?php } ?>
+			<?php endif; ?>
 		</div>
     </body>
 </html>

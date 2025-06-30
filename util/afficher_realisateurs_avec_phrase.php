@@ -1,10 +1,20 @@
-<?php // v1.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend) et Roger Huang (frontend/design)
-// v3.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend)
+<?php
+/**
+ * Utilitaire : realisateurs_avec_phrase (obtenir les réalisateurs sous forme d'une phrase "Réalisé par .. (et ..)")
+ * Version : v3.0
+ * Auteur : Alain Barbier alias "Metroidzeta" (backend/frontend), Roger Huang (frontend/design)
+ */
 
 function realisateurs_avec_phrase($realisateurs) {
-	$nomsRealisateurs = array_column($realisateurs,'NOM');
-	if(!empty($nomsRealisateurs)) {
-		echo 'Réalisé par ' . implode(' et ',$nomsRealisateurs);
-	}
+	if (empty($realisateurs)) return '';
+
+	$noms = explode(', ', $realisateurs);
+	$count = count($noms);
+
+	if ($count === 1) return 'Réalisé par ' . $noms[0];
+	if ($count === 2) return 'Réalisé par ' . $noms[0] . ' et ' . $noms[1];
+
+	$dernier = array_pop($noms);
+	return 'Réalisé par ' . implode(', ', $noms) . ' et ' . $dernier;
 }
 ?>

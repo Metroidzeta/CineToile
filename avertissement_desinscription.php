@@ -1,5 +1,9 @@
-<?php // v1.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend) et Roger Huang (frontend/design)
-// v3.0 @author Alain Barbier alias "Metroidzeta" (backend/frontend)
+<?php
+/**
+ * Page : Affichage de la page d'avertissement de la désinscription (/avertissement_desinscription)
+ * Version : v3.0
+ * Auteur : Alain Barbier alias "Metroidzeta" (backend/frontend), Roger Huang (frontend/design)
+ */
 
 $racine = $_SERVER['DOCUMENT_ROOT'];
 

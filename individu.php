@@ -1,8 +1,8 @@
 <?php
 /**
  * Page : Affichage de la page d'un individu (/individu?id=X)
- * Version : v3.0
- * Auteur : Alain Barbier alias "Metroidzeta" (backend/frontend), Roger Huang (frontend/design)
+ * Version : v4.0
+ * Auteur : Alain Barbier alias "Metroidzeta" (fullstack : backend/frontend), Roger Huang (frontend/design)
  */
 
 $racine = $_SERVER['DOCUMENT_ROOT'];
@@ -12,36 +12,23 @@ require $racine . '/CineToile/util/connexionBDD.php';
 require $racine . '/CineToile/util/extraire_metiers.php';
 require $racine . '/CineToile/util/extraire_date.php';
 
+require $racine . '/CineToile/models/individuModel.php';
+
 $individu = false;
 
 if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
-	$id = (int) $_GET['id']; // On récupére l'id de l'individu venant de GET
-	$individu = executeReqFetchArgs( // On récupére les données de cet individu
-		$dbh,
-		'SELECT * FROM individus
-		WHERE id_individu = ?',
-		[$id]
-	);
+	$id = (int) $_GET['id'];
+	$individu = getIndividu($dbh, $id);
 
 	if ($individu) {
-		$birth_date = obtenirDate($individu['DATE_NAISSANCE']);
+		$dateNaissanceAffichee = extraireDate($individu['DATE_NAISSANCE']);
+		$age = null;
 		if (!empty($individu['DATE_NAISSANCE'])) {
-			$time_birth_date = strtotime($individu['DATE_NAISSANCE']);
-			$age = date('Y') - date('Y', $time_birth_date) - (date('md') < date('md', $time_birth_date) ? 1 : 0);
+			$age = calculerAge($individu['DATE_NAISSANCE']);
 		}
 
-		$genre = '';
-		if (!empty($individu['GENRE'])) {
-			$genre = $individu['GENRE'];
-			$genre = $genre === 'H' ? 'Homme' : ($genre === 'F' ? 'Femme' : '');
-		}
-
-		$films = executeReqFetchAllArgs($dbh, // On récupére la filmographie associée à cet individu
-			'SELECT DISTINCT films.id_film, TITRE, AFFICHE FROM films
-			INNER JOIN films_individus ON films.id_film = films_individus.id_film
-			WHERE id_individu = ?',
-			[$id]
-		);
+		$genre = !empty($individu['GENRE']) ? getGenre($individu['GENRE']) : '';
+		$films = getFilmsIndividu($dbh, $id); // On récupére la filmographie associée à cet individu
 	}
 }
 ?>
@@ -58,7 +45,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 				<div class="row">
 					<!-- Photo de l'individu -->
 					<div class="text-center col-lg-3 col-md-8 offset-md-2 col-10 offset-1">
-						<img class="img-fluid" src="/CineToile/img/individus/<?= basename(rawurldecode($individu['PHOTO'])) ?>" alt="photo de <?= htmlspecialchars($individu['NOM']) ?>"/>
+						<img class="img-fluid" loading="lazy" src="/CineToile/img/individus/<?= basename(rawurldecode($individu['PHOTO'])) ?>" alt="photo de <?= htmlspecialchars($individu['NOM']) ?>"/>
 					</div>
 
 					<!-- Informations sur l'individu -->
@@ -67,11 +54,11 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 						<table class="table">
 							<tr>
 								<th scope="row">Date de naissance</th>
-								<td><?= $birth_date ?></td>
+								<td><?= $dateNaissanceAffichee ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Métiers</th>
-								<td><?= obtenirMetiers($individu['METIERS'], $individu['GENRE']) ?></td>
+								<td><?= extraireMetiers($individu['METIERS'], $individu['GENRE']) ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Nationalité</th>
@@ -79,7 +66,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 							</tr>
 							<tr>
 								<th scope="row">Age</th>
-								<td><?= !empty($birth_date) ? $age . ' ans' : '' ?></td>
+								<td><?= !empty($dateNaissanceAffichee) ? $age . ' ans' : '' ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Genre</th>
@@ -105,7 +92,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 							<?php foreach($films as $film): ?>
 								<div class="col-lg-3 col-md-4 col-6">
 									<a href="film?id=<?= (int) $film['id_film'] ?>">
-										<img class= "img-fluid" src="/CineToile/img/affiches/<?= basename(rawurldecode($film['AFFICHE'])) ?>" alt="affiche <?= htmlspecialchars($film['TITRE']) ?>">
+										<img class= "img-fluid" src="/CineToile/img/affiches/<?= basename(rawurldecode($film['AFFICHE'])) ?>" alt="affiche du film <?= htmlspecialchars($film['TITRE']) ?>">
 										<?= htmlspecialchars($film['TITRE']) ?>
 									</a>
 								</div>

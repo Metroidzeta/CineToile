@@ -27,6 +27,14 @@ function executeReqFetch($db, $req) {
 	return $data;
 }
 
+function executeReqFetchColumn($db, $req) {
+    $requete = $db->prepare($req);
+    $requete->execute();
+    $data = $requete->fetchColumn(); // Récupère la première colonne de la première ligne
+    $requete->closeCursor();
+    return $data;
+}
+
 function executeReqFetchArgs($db, $req, $args) {
 	$requete = $db->prepare($req);
 	$requete->execute($args);

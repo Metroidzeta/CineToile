@@ -15,23 +15,18 @@ define('NB_ARTICLES_PAR_PAGE', 8); // Nombre d'articles par page (par défaut : 
 $article = null;
 
 if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
-	$id = (int) $_GET['id']; // On récupére l'id de l'article
-
-	$article = executeReqFetchArgs( // On récupére les données de l'article
-		$dbh,
+	$id = (int) $_GET['id'];
+	$article = executeReqFetchArgs($dbh, // On récupére les données de l'article
 		'SELECT * FROM articles
-		WHERE id_article = ?',
-		[$id]
+		WHERE id_article = ?',[$id]
 	);
 
 	if($article) {
-		$nbArticles = executeReqFetch( // Nombre d'articles existants dans la BDD
-			$dbh,
-			'SELECT COUNT(*) AS nb_articles
-			FROM articles')['nb_articles'];
-
-		$nbPages = (int) ceil($nbArticles / NB_ARTICLES_PAR_PAGE); // Arrondi au nombre supérieur
-		$numPage_precedente = $nbPages - intdiv($id - 1,NB_ARTICLES_PAR_PAGE);
+		$nbArticles = executeReqFetchColumn($dbh, // Nombre d'articles existants
+			'SELECT COUNT(*) FROM articles'
+		);
+		$nbPages = (int) ceil($nbArticles / NB_ARTICLES_PAR_PAGE); // Arrondie à l'entier supérieur
+		$numPage_precedente = $nbPages - intdiv($id - 1, NB_ARTICLES_PAR_PAGE);
 	}
 }
 ?>
@@ -47,7 +42,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 			<?php if ($article): ?>
 				<!-- Date -->
 				<div class="dateArticle text-center">
-					<?= obtenirDate($article['DATE_ARTICLE']) ?>
+					<?= extraireDate($article['DATE_ARTICLE']) ?>
 				</div>
 
 				<!-- Titre -->
@@ -69,7 +64,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 				<!-- Image  -->
 				<div class="row pt-3">
 					<div class="col-10 offset-1 text-center">
-						<img class="img-fluid" loading="lazy" src="img/actualites/<?= basename(rawurldecode($article['IMAGE_ARTICLE'])) ?>" alt="image article <?= htmlspecialchars($article['TITRE']) ?>"/>
+						<img class="img-fluid" loading="lazy" src="/CineToile/img/actualites/<?= basename(rawurldecode($article['IMAGE_ARTICLE'])) ?>" alt="image article <?= htmlspecialchars($article['TITRE']) ?>"/>
 					</div>
 				</div>
 

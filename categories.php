@@ -10,10 +10,7 @@ $racine = $_SERVER['DOCUMENT_ROOT'];
 require $racine . '/CineToile/util/verifSession.php';
 require $racine . '/CineToile/util/connexionBDD.php';
 
-$categories = executeReqFetchAll( // On récupére toutes les catégories de films
-					$dbh,
-					'SELECT * FROM categories');
-
+$categories = executeReqFetchAll($dbh, 'SELECT * FROM categories'); // On récupére toutes les catégories
 $nbCategories = count($categories);
 ?>
 <!DOCTYPE html>
@@ -29,7 +26,7 @@ $nbCategories = count($categories);
 			<div class="row pt-2">
 				<?php if ($nbCategories > 0):
 					foreach ($categories as $index => $categorie): ?>
-						<div class="boxCategories col-2 offset-<?= ($index % 3 === 0) ? '2' : '1' ?> mt-3 p-2">
+						<div class="boxCategories col-2 offset-<?= $index % 3 === 0 ? '2' : '1' ?> mt-3 p-2">
 							<a class="lienCategories" href="categories_recherche?id=<?= (int) $categorie['id_categorie'] ?>"><?= htmlspecialchars($categorie['NOM']) ?></a>
 						</div>
 					<?php endforeach; ?>
