@@ -5,7 +5,7 @@
  * Auteur : Alain Barbier alias "Metroidzeta" (backend/frontend), Roger Huang (frontend/design)
  */
 
-function realisateurs_avec_phrase($realisateurs) {
+function realisateurs_avec_phrase($realisateurs) : string {
 	if (empty($realisateurs)) return '';
 
 	$noms = explode(', ', $realisateurs);

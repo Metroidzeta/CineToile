@@ -1,8 +1,10 @@
 <?php
 /**
- * Page : Affichage de la page connexion (/connexion)
- * Version : v3.0
- * Auteur : Alain Barbier alias "Metroidzeta" (backend/frontend), Roger Huang (frontend/design)
+ * Page de connexion (/connexion)
+ *
+ * @version 4.0
+ * @author Alain Barbier alias "Metroidzeta" (fullstack: backend/frontend)
+ * @author Roger Huang (frontend/design)
  */
 
 $racine = $_SERVER['DOCUMENT_ROOT'];
@@ -11,57 +13,44 @@ require $racine . '/CineToile/util/verifSession.php';
 require $racine . '/CineToile/util/page_interdite_si_connecte.php';
 require $racine . '/CineToile/util/connexionBDD.php';
 
+require $racine . '/CineToile/models/ConnexionModel.php';
 $msgErr = '';
 
-if (isset($_POST['connexion']) && !empty($_POST['connexion'])) {
-	$email = htmlspecialchars(trim($_POST['email'])); // On récupére l'email
-	$password = htmlspecialchars(trim($_POST['password'])); // On récupére le mot de passe
+// Génération du token CSRF s'il n'existe pas déjà
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
-	$user = executeReqFetchArgs($dbh, // On récupére les informations de l'utilisateur
-		'SELECT *
-		FROM utilisateurs
-		WHERE EMAIL = ?',[$email]
-	);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+	// Vérification du token CSRF
+	if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+		die('Erreur CSRF : formulaire invalide ou expiré.');
+	}
 
-	if (!$user) { // Si l'utilisateur n'existe pas (cet email n'existe pas)
-		$msgErr .= "- Cet email n'existe pas<br />";
-	} else if (!password_verify($password, $user['MOTDEPASSE'])) { // Si mdp incorrect
-		$msgErr .= '- Le mot passe est incorrect<br />';
-	} else { // Correct
-		$_SESSION['pseudo'] = $user['pseudo'];
-		$_SESSION['EMAIL'] = $user['EMAIL'];
-		header('Location:/CineToile/profil');
-		die();
+	$email = trim($_POST['email'] ?? ''); // On récupére l'email
+	$password = trim($_POST['password'] ?? ''); // On récupére le mot de passe
+
+	if ($email === '' || $password === '') {
+		$msgErr = 'Tous les champs sont requis';
+	}
+	else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+		$msgErr = 'Email invalide';
+	} else {
+		$model = new ConnexionModel($dbh);
+		$user = $model->getUtilisateurDepuisEmail($email);
+		if (!$user || !password_verify($password, $user['MOTDEPASSE'])) { // email ou password incorrect
+            $msgErr = 'Email ou mot de passe incorrect';
+        } else { // Connexion réussie : stockage en session
+			session_regenerate_id(true);
+			$_SESSION['pseudo'] = $user['pseudo'];
+			$_SESSION['EMAIL'] = $user['EMAIL'];
+			$_SESSION['csrf_token'] = bin2hex(random_bytes(32)); // Régénérer un nouveau token CSRF pour la session
+			header('Location:/CineToile/profil');
+			exit;
+		}
 	}
 }
-?>
-<!DOCTYPE html>
-<html lang="fr">
-	<head>
-		<?php require $racine . '/CineToile/base/head.php'; ?>
-	</head>
-	<body class="body_formulaire">
-		<?php require $racine . '/CineToile/base/barremenu.php'; ?>
 
-		<div class="container">
-			<div id="formulaire" class="text-center">
-				<h2>Connexion</h2>
-				<form action="connexion" method="POST" autocomplete="off">
-					<div class="mb-3">
-						<input type="email" name="email" class="form-control" placeholder="Email" value="<?= !empty($msgErr) ? $email : '' ?>" required/>
-					</div>
-					<div class="mb-3">
-						<input type="password" name="password" class="form-control" placeholder="Mot de passe" required/>
-					</div>
-					<div class="mb-3">
-						<input type="submit" name="connexion" class="btn btn-danger" value="Se connecter"/>
-					</div>
-				</form>
-				<p>Pas encore inscris ? <a class="text-danger" href="inscription">Incrivez-vous!</a></p>
-				<?php if(!empty($msgErr)): ?>
-					<div class="alert alert-danger"><?= $msgErr ?></div>
-				<?php endif; ?>
-			</div>
-		</div>
-    </body>
-</html>
+$view = $racine . '/CineToile/views/connexionView.php';
+require $racine . '/CineToile/views/layout.php';
+?>
