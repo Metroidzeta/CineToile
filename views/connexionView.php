@@ -25,7 +25,7 @@
 						</div>
 					</form>
 					<p>Pas encore inscrit ? <a class="text-danger" href="inscription">Inscrivez-vous !</a></p>
-					<?php if(!empty($msgErr)): ?>
+					<?php if (!empty($msgErr)): ?>
 						<div class="alert alert-danger"><?= htmlspecialchars($msgErr) ?></div>
 					<?php endif; ?>
 				</div>

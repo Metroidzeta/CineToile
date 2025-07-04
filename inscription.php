@@ -99,9 +99,9 @@ if (isset($_POST['inscription']) && !empty($_POST['inscription'])) { // On récu
 						<input type="submit" name="inscription" class="btn btn-danger" value="S'inscrire"/>
 					</div>
 				</form>
-				<?php if($valid): ?>
+				<?php if ($valid): ?>
 					<div class="alert alert-success">Votre inscription a bien été prise en compte !</div>
-				<?php elseif(!empty($msgErr)): ?>
+				<?php elseif (!empty($msgErr)): ?>
 					<div class="alert alert-danger"><?= $msgErr ?></div>
 				<?php endif; ?>
 			</div>
